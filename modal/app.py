@@ -1,16 +1,20 @@
 import streamlit as st
 from openai import OpenAI
+from dotenv import load_dotenv
 import requests
 import toml
+import os
 
-st.title("Modal LLaMA3.1 Deployment")
+st.title("Modal Llama 3.1 Deployment")
 
-## TODO: change to Modal Secrets, not streamlit
+load_dotenv() 
 
-api_url = st.secrets["MODAL_BASE_URL"] + "/v1"
+base_url = os.environ.get("MODAL_BASE_URL")
+token = os.environ.get("DSBA_LLAMA3_KEY")
+api_url = base_url + "/v1"
 
 # Set API key from Streamlit secrets
-client = OpenAI(api_key=st.secrets["DSBA_LLAMA3_KEY"], base_url=api_url)
+client = OpenAI(api_key=token, base_url=api_url)
 
 if "openai_model" not in st.session_state:
     st.session_state["openai_model"] = "/models/NousResearch/Meta-Llama-3.1-8B-Instruct"
@@ -23,9 +27,9 @@ if "messages" not in st.session_state:
 def check_api_health():
     try:
         headers = {
-            "Authorization": f"Bearer {st.secrets['DSBA_LLAMA3_KEY']}"
+            "Authorization": f"Bearer {token}"
         }
-        response = requests.get(f"{st.secrets['MODAL_BASE_URL']}/health", headers=headers, timeout=5)
+        response = requests.get(f"{base_url}/health", headers=headers, timeout=5)
         return response.status_code == 200
     except requests.RequestException:
         return False

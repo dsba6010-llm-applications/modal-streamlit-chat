@@ -19,14 +19,28 @@ $ python -m streamlit run app.py
 
 # To run on modal:
 
+Make sure you have a [Modal account](https://modal.com/). 
+
+First, sign in:
+
 ```bash
 # sign in
 $ modal setup
+```
+
+Then set Modal secrets first as `dsba-llama3-key` with the secret name `DSBA_LLAMA3_KEY` and `modal-base-url` as `MODAL_BASE_URL` which is your LLM serving endpoint (not including `v1/`).
+
+You can run a temporary "dev" environment to test:
+
+```bash
 # to test
 $ modal serve modal/serve_streamlit.py
+```
 
+Or deploy it as a new app to modal:
+
+```bash
 # when ready to deploy
 $ modal deploy modal/serve_streamlit.py
 ```
 
-TODO: Switch to modal secrets

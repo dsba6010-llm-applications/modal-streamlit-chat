@@ -27,7 +27,7 @@ import modal
 # image definition.
 
 image = modal.Image.debian_slim(python_version="3.11").pip_install(
-    "streamlit~=1.37.0", "openai==1.37.1"
+    "streamlit~=1.37.0", "openai==1.37.1", "python-dotenv==1.0.1"
 )
 
 app = modal.App(name="modal-streamlit-chat", image=image)
@@ -56,11 +56,11 @@ streamlit_script_mount = modal.Mount.from_local_file(
 # `subprocess.Popen`. We also expose port 8000 using the `@web_server` decorator.
 
 
-## TODO: change to Modal secrets
-
 @app.function(
     allow_concurrent_inputs=100,
     mounts=[streamlit_script_mount],
+    secrets=[modal.Secret.from_name("dsba-llama3-key"),
+             modal.Secret.from_name("modal-base-url")],
 )
 @modal.web_server(8000)
 def run():
