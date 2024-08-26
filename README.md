@@ -25,7 +25,7 @@ First, sign in:
 
 ```bash
 # sign in
-$ modal setup
+$ python -m modal setup
 ```
 
 Then set Modal secrets first as `dsba-llama3-key` with the secret name `DSBA_LLAMA3_KEY` and `modal-base-url` as `MODAL_BASE_URL` which is your LLM serving endpoint (not including `v1/`).
