@@ -5,7 +5,7 @@ import requests
 import toml
 import os
 
-st.title("Modal Llama 3.1 Deployment")
+st.title("Modal Llama 3 Deployment")
 
 load_dotenv() 
 
@@ -17,7 +17,7 @@ api_url = base_url + "/v1"
 client = OpenAI(api_key=token, base_url=api_url)
 
 if "openai_model" not in st.session_state:
-    st.session_state["openai_model"] = "/models/NousResearch/Meta-Llama-3.1-8B-Instruct"
+    st.session_state["openai_model"] = "/models/NousResearch/Meta-Llama-3-8B-Instruct"
 
 # Initialize chat history
 if "messages" not in st.session_state:
