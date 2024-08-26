@@ -2,10 +2,11 @@ import streamlit as st
 from openai import OpenAI
 from dotenv import load_dotenv
 import requests
+import time
 import toml
 import os
 
-st.title("Modal Llama 3 Deployment")
+st.title("Modal Llama 3 Instruct Deployment")
 
 load_dotenv() 
 
@@ -70,6 +71,7 @@ if prompt := st.chat_input("What is up?"):
     with st.chat_message("user"):
         st.markdown(prompt)
 
+    start_time = time.time()
     # Display assistant response in chat message container
     with st.chat_message("assistant"):
         message_placeholder = st.empty()
@@ -94,6 +96,12 @@ if prompt := st.chat_input("What is up?"):
                 full_response += chunk.choices[0].delta.content or ""
                 message_placeholder.markdown(full_response + "▌")
             message_placeholder.markdown(full_response)
+
+            # Add latency print statement
+            end_time = time.time()
+            latency = end_time - start_time
+            st.info(f"Latency: {latency:.2f} seconds")
+
         except Exception as e:
             st.error(f"An error occurred: {str(e)}")
             full_response = "I apologize, but I encountered an error while processing your request."
