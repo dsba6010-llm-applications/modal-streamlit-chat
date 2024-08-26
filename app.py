@@ -3,7 +3,7 @@ from openai import OpenAI
 import requests
 import toml
 
-st.title("Modal LLaMA3.1 Deployment")
+st.title("Modal LLaMA3 Deployment")
 
 api_url = st.secrets["MODAL_BASE_URL"] + "/v1"
 
@@ -11,7 +11,7 @@ api_url = st.secrets["MODAL_BASE_URL"] + "/v1"
 client = OpenAI(api_key=st.secrets["DSBA_LLAMA3_KEY"], base_url=api_url)
 
 if "openai_model" not in st.session_state:
-    st.session_state["openai_model"] = "/models/NousResearch/Meta-Llama-3.1-8B-Instruct"
+    st.session_state["openai_model"] = "/models/NousResearch/Meta-Llama-3-8B-Instruct"
 
 # Initialize chat history
 if "messages" not in st.session_state:
