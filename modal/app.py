@@ -100,7 +100,8 @@ if prompt := st.chat_input("What is up?"):
             # Add latency print statement
             end_time = time.time()
             latency = end_time - start_time
-            st.info(f"Latency: {latency:.2f} seconds")
+            tokens = len(full_response.split()) + 1
+            st.info(f"Latency: {tokens / latency:.2f} tokens per seconds")
 
         except Exception as e:
             st.error(f"An error occurred: {str(e)}")
