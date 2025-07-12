@@ -1,3 +1,7 @@
-streamlit==1.37.0
-openai==1.37.1
-modal==0.63.57
+streamlit==1.46.1
+openai==1.95.1
+arize-otel==0.9.0
+modal==1.0.5
+python-dotenv==1.1.1
+wrapt==1.17.2
+openinference-instrumentation-openai==0.1.30
