@@ -10,7 +10,7 @@ import os
 
 
 
-client = OpenAI()
+
 
 st.title("Llama 4 Maverick Instruct Deployment")
 
@@ -18,9 +18,10 @@ load_dotenv()
 
 base_url = os.environ.get("BASE_URL")
 token = os.environ.get("API_KEY")
-os.environ['OPENAI_API_KEY'] = token
-os.environ['OPENAI_BASE_URL'] = base_url + "/v1"
 model_name = os.environ.get("MODEL_NAME")
+client = OpenAI(api_key=token, base_url=base_url)
+
+
 
 ARIZE_SPACE_ID = os.environ.get("ARIZE_SPACE_ID")
 ARIZE_API_KEY = os.environ.get("ARIZE_API_KEY")
