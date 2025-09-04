@@ -1,39 +1,60 @@
 import streamlit as st
+from openinference.instrumentation.openai import OpenAIInstrumentor
 from openai import OpenAI
+from arize.otel import register
 from dotenv import load_dotenv
 import requests
 import time
 import toml
 import os
 
-st.title("Modal Llama 3 Instruct Deployment")
+
+
+
+
+st.title("Llama 4 Maverick Instruct Deployment")
 
 load_dotenv() 
 
-base_url = os.environ.get("MODAL_BASE_URL")
-token = os.environ.get("DSBA_LLAMA3_KEY")
-api_url = base_url + "/v1"
+base_url = os.environ.get("BASE_URL")
+token = os.environ.get("API_KEY")
+model_name = os.environ.get("MODEL_NAME")
+client = OpenAI(api_key=token, base_url=base_url)
 
-# Set API key from Streamlit secrets
-client = OpenAI(api_key=token, base_url=api_url)
+
+
+ARIZE_SPACE_ID = os.environ.get("ARIZE_SPACE_ID")
+ARIZE_API_KEY = os.environ.get("ARIZE_API_KEY")
+ARIZE_PROJECT_NAME = os.environ.get("ARIZE_PROJECT_NAME")
+
+@st.cache_resource
+def _configure_logging():
+    tracer_provider = register(
+        space_id = ARIZE_SPACE_ID,
+        api_key = ARIZE_API_KEY,
+        project_name = ARIZE_PROJECT_NAME
+    )
+    OpenAIInstrumentor().instrument(tracer_provider=tracer_provider)
+
+_configure_logging()
 
 if "openai_model" not in st.session_state:
-    st.session_state["openai_model"] = "/models/NousResearch/Meta-Llama-3-8B-Instruct"
+    st.session_state["openai_model"] = model_name
 
 # Initialize chat history
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
 # Function to check API health
-def check_api_health():
-    try:
-        headers = {
-            "Authorization": f"Bearer {token}"
-        }
-        response = requests.get(f"{base_url}/health", headers=headers, timeout=5)
-        return response.status_code == 200
-    except requests.RequestException:
-        return False
+# def check_api_health():
+#     try:
+#         headers = {
+#             "Authorization": f"Bearer {token}"
+#         }
+#         response = requests.get(f"{base_url}/health", headers=headers, timeout=5)
+#         return response.status_code == 200
+#     except requests.RequestException:
+#         return False
 
 # Sidebar
 st.sidebar.title("Chat Settings")
@@ -53,10 +74,10 @@ if st.sidebar.button("Reset Chat"):
     st.session_state.messages = []
     st.sidebar.success("Chat session reset!")
 
-# Check API health and display warning if not healthy
-api_healthy = check_api_health()
-if not api_healthy:
-    st.warning("Warning: The API endpoint is currently unavailable. Some features may not work properly.")
+# # Check API health and display warning if not healthy
+# api_healthy = check_api_health()
+# if not api_healthy:
+#     st.warning("Warning: The API endpoint is currently unavailable. Some features may not work properly.")
 
 # Display chat messages from history on app rerun
 for message in st.session_state.messages:

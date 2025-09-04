@@ -26,45 +26,42 @@ import modal
 # The `app.py` script imports three third-party packages, so we include these in the example's
 # image definition.
 
-image = modal.Image.debian_slim(python_version="3.11").pip_install(
-    "streamlit~=1.37.0", "openai==1.37.1", "python-dotenv==1.0.1"
+streamlit_script_local_path = Path(__file__).parent / "app.py"
+streamlit_script_remote_path = "/root/app.py"
+
+image = (
+    modal.Image.debian_slim(python_version="3.10.11")
+    .pip_install("streamlit~=1.46.1", "openai==1.95.1", "python-dotenv==1.1.1", "arize-otel~=0.9.0", "httpx==0.28.1", "wrapt==1.17.2", "openinference-instrumentation-openai==0.1.30")
+    .add_local_file(
+        streamlit_script_local_path,
+        streamlit_script_remote_path,
+    )
 )
 
-app = modal.App(name="modal-streamlit-chat", image=image)
-
-# ## Mounting the `app.py` script
-#
-# We can just mount the `app.py` script inside the container at a pre-defined path using a Modal
-# [`Mount`](https://modal.com/docs/guide/local-data#mounting-directories).
-
-streamlit_script_local_path = Path(__file__).parent / "app.py"
-streamlit_script_remote_path = Path("/root/app.py")
+app = modal.App(name="example-modal-streamlit", image=image)
 
 if not streamlit_script_local_path.exists():
     raise RuntimeError(
         "app.py not found! Place the script with your streamlit app in the same directory."
     )
 
-streamlit_script_mount = modal.Mount.from_local_file(
-    streamlit_script_local_path,
-    streamlit_script_remote_path,
-)
+
+# ## Mounting the `app.py` script
+#
+# We can just mount the `app.py` script inside the container at a pre-defined path using a Modal
+# [`Mount`](https://modal.com/docs/guide/local-data#mounting-directories).
+
 
 # ## Spawning the Streamlit server
 #
 # Inside the container, we will run the Streamlit server in a background subprocess using
 # `subprocess.Popen`. We also expose port 8000 using the `@web_server` decorator.
 
-
-@app.function(
-    allow_concurrent_inputs=100,
-    mounts=[streamlit_script_mount],
-    secrets=[modal.Secret.from_name("dsba-llama3-key"),
-             modal.Secret.from_name("modal-base-url")],
-)
+@app.function()
+@modal.concurrent(max_inputs=100)
 @modal.web_server(8000)
 def run():
-    target = shlex.quote(str(streamlit_script_remote_path))
+    target = shlex.quote(streamlit_script_remote_path)
     cmd = f"streamlit run {target} --server.port 8000 --server.enableCORS=false --server.enableXsrfProtection=false"
     subprocess.Popen(cmd, shell=True)
 
